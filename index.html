@@ -8,7 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-/* ---------- BASE ---------- */
 body{
     margin:0;
     overflow:hidden;
@@ -17,7 +16,6 @@ body{
 }
 canvas{display:block;}
 
-/* ---------- CORAZÓN ---------- */
 #start{
     position:absolute;
     top:50%;
@@ -33,7 +31,6 @@ canvas{display:block;}
     50%{transform:translate(-50%,-50%) scale(1.2);}
 }
 
-/* ---------- BOTÓN ---------- */
 #loveBtn{
     position:absolute;
     top:72%;
@@ -63,7 +60,6 @@ canvas{display:block;}
     50%{transform:translate(-50%,-50%) scale(1.08);}
 }
 
-/* ---------- PANTALLA CARTA ---------- */
 #screen4{
     position:fixed;
     inset:0;
@@ -76,7 +72,6 @@ canvas{display:block;}
     z-index:30;
 }
 
-/* ---------- CARTA ---------- */
 .card{
     background:#fff0f6;
     padding:clamp(18px,4vw,32px);
@@ -106,9 +101,8 @@ canvas{display:block;}
     margin-bottom:clamp(12px,2.5vw,18px);
 }
 
-/* ---------- EXTRA MOBILE ---------- */
 @media (max-width:480px){
-    #loveBtn{ top:76%; }
+    #loveBtn{ top:78%; }
     .card{ border-radius:18px; }
 }
 </style>
@@ -120,7 +114,6 @@ canvas{display:block;}
 <button id="loveBtn">Tocar aquí</button>
 <canvas id="canvas"></canvas>
 
-<!-- CARTA -->
 <div id="screen4">
   <div class="card">
     <h2>Mi amor Daniela 💖</h2>
@@ -146,9 +139,7 @@ canvas{display:block;}
     <p>
       Gracias por llegar a mi vida y devolverme toda esa felicidad que creía perdida.
       Quiero amarte el resto de mi vida, cuidarte, protegerte y hacerte feliz.
-      Eres la mujer más increíble que he conocido y cada día me sorprendes más.
-      Si Dios lo permite, quiero tener una familia contigo,
-      formar un hogar lleno de amor, risas y muchas locuras.
+      Eres la mujer más increíble que he conocido.
     </p>
 
     <p>
@@ -164,79 +155,92 @@ canvas{display:block;}
 </div>
 
 <script>
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
-const loveBtn=document.getElementById("loveBtn");
-const screen4=document.getElementById("screen4");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const loveBtn = document.getElementById("loveBtn");
+const screen4 = document.getElementById("screen4");
+const start = document.getElementById("start");
 
 function resize(){
-    canvas.width=innerWidth;
-    canvas.height=innerHeight;
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
 }
 resize();
-addEventListener("resize",resize);
+addEventListener("resize", resize);
 
-let particles=[], formingText=false;
+let particles = [];
+let formingText = false;
 
-start.onclick=()=>{
-    start.style.display="none";
+start.onclick = () => {
+    start.style.display = "none";
     explode();
     animate();
 };
 
 function explode(){
-    const cx=canvas.width/2, cy=canvas.height/2;
+    const cx = canvas.width/2;
+    const cy = canvas.height/2;
     for(let i=0;i<900;i++){
         particles.push({
-            x:cx,y:cy,
-            vx:(Math.random()-.5)*16,
-            vy:(Math.random()-.5)*16,
-            tx:null,ty:null
+            x:cx, y:cy,
+            vx:(Math.random()-.5)*14,
+            vy:(Math.random()-.5)*14,
+            tx:null, ty:null
         });
     }
-    setTimeout(formText,2200);
+    setTimeout(formText, 2200);
 }
 
 function formText(){
-    const t=document.createElement("canvas").getContext("2d");
-    t.canvas.width=canvas.width;
-    t.canvas.height=canvas.height;
+    const t = document.createElement("canvas").getContext("2d");
+    t.canvas.width = canvas.width;
+    t.canvas.height = canvas.height;
 
-    let size=Math.min(canvas.width/8,140);
-    t.fillStyle="white";
-    t.textAlign="center";
-    t.textBaseline="middle";
-    t.font="bold "+size+"px 'Segoe Script','cursive'";
-    t.fillText("Feliz San Valentín ❤",canvas.width/2,canvas.height/2);
+    let baseSize = Math.min(canvas.width * 0.08, canvas.height * 0.12, 110);
+    t.fillStyle = "white";
+    t.textAlign = "center";
+    t.textBaseline = "middle";
+    t.font = "bold "+baseSize+"px 'Segoe Script','cursive'";
 
-    const data=t.getImageData(0,0,canvas.width,canvas.height).data;
-    let pts=[];
+    const centerY = canvas.height * 0.45;
+
+    if(canvas.width < 520){
+        t.fillText("Feliz", canvas.width/2, centerY - baseSize*0.6);
+        t.fillText("San Valentín ❤️", canvas.width/2, centerY + baseSize*0.6);
+    }else{
+        t.fillText("Feliz San Valentín ❤️", canvas.width/2, centerY);
+    }
+
+    const data = t.getImageData(0,0,canvas.width,canvas.height).data;
+    let pts = [];
     for(let y=0;y<canvas.height;y+=4){
         for(let x=0;x<canvas.width;x+=4){
             if(data[(y*canvas.width+x)*4+3]>160) pts.push({x,y});
         }
     }
 
-    particles=pts.map(p=>({
+    particles = pts.map(p=>({
         x:Math.random()*canvas.width,
         y:Math.random()*canvas.height,
-        vx:0,vy:0,tx:p.x,ty:p.y
+        vx:0, vy:0,
+        tx:p.x, ty:p.y
     }));
 
-    formingText=true;
-    setTimeout(()=>loveBtn.classList.add("show"),900);
+    formingText = true;
+    setTimeout(()=>loveBtn.classList.add("show"), 900);
 }
 
 function animate(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     particles.forEach(p=>{
         if(formingText){
-            p.vx+=(p.tx-p.x)*0.018;
-            p.vy+=(p.ty-p.y)*0.018;
-            p.vx*=0.85; p.vy*=0.85;
-        }else p.vy+=0.04;
-
-        p.x+=p.vx; p.y+=p.vy;
+            p.vx += (p.tx-p.x)*0.018;
+            p.vy += (p.ty-p.y)*0.018;
+            p.vx *= 0.85;
+            p.vy *= 0.85;
+        }
+        p.x += p.vx;
+        p.y += p.vy;
 
         ctx.beginPath();
         ctx.arc(p.x,p.y,1.1,0,Math.PI*2);
@@ -246,7 +250,7 @@ function animate(){
     requestAnimationFrame(animate);
 }
 
-loveBtn.onclick=()=>screen4.style.display="flex";
+loveBtn.onclick = () => screen4.style.display = "flex";
 </script>
 
 </body>
